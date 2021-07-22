@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 class Clock extends React.Component {
   constructor(props) {
@@ -27,9 +28,9 @@ class Clock extends React.Component {
 
   render() {
     return (
-      <div>
-        <h1>Bonjour, monde !</h1>
-        <h2>Il est {this.state.date.toLocaleTimeString()}.</h2>
+      <div className="text-center text-secondary mt-5">
+        <h1>Hello World!</h1>
+        <h2>It's {this.state.date.toLocaleTimeString()}.</h2>
       </div>
     );
   }
@@ -85,6 +86,7 @@ class Game extends React.Component {
       }],
       stepNumber: 0,
       xIsNext: true,
+      pos: [],
     };
   }
 
@@ -96,12 +98,15 @@ class Game extends React.Component {
       return;
     }
     squares[i] = this.state.xIsNext ? 'X' : 'O';
+    const pos = this.state.pos.slice(0, this.state.stepNumber);
+    const position = i;
     this.setState({
       history: history.concat([{
         squares: squares,
       }]),
       stepNumber: history.length,
       xIsNext: !this.state.xIsNext,
+      pos: pos.concat([position]),
     });
   }
 
@@ -116,14 +121,38 @@ class Game extends React.Component {
     const history = this.state.history;
     const current = history[this.state.stepNumber];
     const winner = calculateWinner(current.squares);
+    const pos = this.state.pos;
 
     const moves = history.map((step, move) => {
-      const desc = move ?
+      let desc = '';
+      if (move !== 0) {
+        switch (pos[move - 1]) {
+          case 0: desc = '(1, 1) '
+            break;
+          case 1: desc = '(2, 1) '
+            break;
+          case 2: desc = '(3, 1) '
+            break;
+          case 3: desc = '(1, 2) '
+            break;
+          case 4: desc = '(2, 2) '
+            break;
+          case 5: desc = '(3, 2) '
+            break;
+          case 6: desc = '(1, 3) '
+            break;
+          case 7: desc = '(2, 3) '
+            break;
+          case 8: desc = '(3, 3) '
+            break;
+        }
+      }
+      desc += move ?
         'Revenir au tour n°' + move :
-        'Revenir au début de la partie'
+        'Revenir au début de la partie';
       return (
         <li key={move}>
-          <button onClick={() => this.jumpTo(move)}>{desc}</button>
+          <button className="btn btn-warning" onClick={() => this.jumpTo(move)}>{desc}</button>
         </li>
       );
     });
@@ -136,11 +165,11 @@ class Game extends React.Component {
     }
 
     return (
-      <div>
+      <div className="container">
         <div>
           <Clock />
         </div>
-        <div className="game">
+        <div className="game d-flex justify-content-center mt-5">
           <div className="game-board">
             <Board
               squares={current.squares}
@@ -148,7 +177,7 @@ class Game extends React.Component {
             />
           </div>
           <div className="game-info">
-            <div>{status}</div>
+            <div className="text-center alert alert-dark" role="alert">{status}</div>
             <ol>{moves}</ol>
           </div>
         </div>
